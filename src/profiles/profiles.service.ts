@@ -4,6 +4,7 @@ import { Repository, SelectQueryBuilder } from 'typeorm';
 import { Profile } from './entities/profile.entity';
 import { GetProfilesDto } from './dto/get-profiles.dto';
 import { SearchProfilesDto } from './dto/search-profiles.dto';
+import { parse } from 'json2csv';
 
 @Injectable()
 export class ProfilesService implements OnModuleInit {
@@ -183,5 +184,20 @@ export class ProfilesService implements OnModuleInit {
     }
 
     return filters;
+  }
+
+  async exportToCsv(dto: GetProfilesDto): Promise<string> {
+    const exportQuery = { ...dto, limit: 10000, page: 1 };
+    const result = await this.findAll(exportQuery);
+    
+    if (!result.data || result.data.length === 0) {
+      throw new BadRequestException('No data to export');
+    }
+
+    try {
+      return parse(result.data);
+    } catch (err) {
+      throw new Error('Error generating CSV');
+    }
   }
 }

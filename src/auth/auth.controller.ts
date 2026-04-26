@@ -23,11 +23,12 @@ export class AuthController {
   async cliExchange(
     @Body('code') code: string,
     @Body('code_verifier') codeVerifier: string,
+    @Body('redirect_uri') redirectUri: string,
   ) {
     if (!code) {
       throw new Error('Code is required');
     }
-    return this.authService.exchangeCliCode(code, codeVerifier);
+    return this.authService.exchangeCliCode(code, codeVerifier, redirectUri);
   }
 
   @Post('refresh')

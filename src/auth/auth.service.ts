@@ -43,18 +43,18 @@ export class AuthService {
     }
   }
 
-  async exchangeCliCode(code: string, codeVerifier: string) {
-    // 1. Exchange the GitHub code for a GitHub Access Token using PKCE
+  async exchangeCliCode(code: string, codeVerifier: string, redirectUri: string) {
+    // 1. Exchange the GitHub code for a GitHub Access Token
     const clientId = this.configService.get('GITHUB_CLIENT_ID');
-    const clientSecret = this.configService.get('GITHUB_CLIENT_SECRET'); // For OAuth apps, Secret is often still required
+    const clientSecret = this.configService.get('GITHUB_CLIENT_SECRET');
     
     const params = new URLSearchParams({
       client_id: clientId,
       client_secret: clientSecret,
       code,
-      // For a strict PKCE flow on GitHub OAuth:
-      // grant_type: 'authorization_code',
-      // code_verifier: codeVerifier // If supported/enforced
+      redirect_uri: redirectUri,
+      grant_type: 'authorization_code',
+      code_verifier: codeVerifier,
     });
 
     const tokenResponse = await fetch('https://github.com/login/oauth/access_token', {
@@ -69,7 +69,7 @@ export class AuthService {
     const tokenData = await tokenResponse.json();
 
     if (tokenData.error) {
-      throw new BadRequestException(`GitHub exchange failed: ${tokenData.error_description}`);
+      throw new BadRequestException(`GitHub exchange failed: ${tokenData.error_description || tokenData.error}`);
     }
 
     // 2. Fetch User Profile from GitHub

@@ -1,5 +1,6 @@
-import { Controller, Get, Post, Body, Req, UseGuards } from '@nestjs/common';
+import { Controller, Get, Post, Body, Req, Res, UseGuards } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
+import { Response } from 'express';
 import { AuthService } from './auth.service';
 
 @Controller({ path: 'auth', version: '1' })
@@ -14,9 +15,32 @@ export class AuthController {
 
   @Get('github/callback')
   @UseGuards(AuthGuard('github'))
-  async githubCallback(@Req() req) {
-    // Successful login from web
-    return this.authService.generateTokens(req.user);
+  async githubCallback(@Req() req, @Res() res: Response) {
+    const tokens = await this.authService.generateTokens(req.user);
+    
+    // Set HTTP-only cookie for access token
+    res.cookie('access_token', tokens.access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 15 * 60 * 1000, // 15 minutes
+    });
+
+    // Redirect to frontend dashboard (default to localhost:5173 for dev)
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    return res.redirect(`${frontendUrl}/dashboard`);
+  }
+
+  @Get('me')
+  @UseGuards(AuthGuard('jwt'))
+  async getMe(@Req() req) {
+    return req.user;
+  }
+
+  @Post('logout')
+  async logout(@Res() res: Response) {
+    res.clearCookie('access_token');
+    return res.status(200).json({ message: 'Logged out' });
   }
 
   @Post('github/cli-exchange')

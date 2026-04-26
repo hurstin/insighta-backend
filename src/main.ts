@@ -3,13 +3,16 @@ import { AppModule } from './app.module';
 import { ValidationPipe, BadRequestException, VersioningType } from '@nestjs/common';
 import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import * as morgan from 'morgan';
+import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
   // Enable CORS
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
   app.enableCors({
-    origin: '*',
+    origin: frontendUrl,
+    credentials: true,
   });
 
   // Enable URI Versioning
@@ -20,6 +23,9 @@ async function bootstrap() {
 
   // Request Logging
   app.use(morgan('dev'));
+
+  // Cookie Parser
+  app.use(cookieParser());
 
   app.useGlobalPipes(new ValidationPipe({
     transform: true,

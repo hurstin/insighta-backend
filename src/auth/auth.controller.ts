@@ -19,11 +19,14 @@ export class AuthController {
     const tokens = await this.authService.generateTokens(req.user);
     
     // Set HTTP-only cookie for access token
+    const isProduction = process.env.NODE_ENV === 'production';
+    
     res.cookie('access_token', tokens.access_token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'lax',
+      secure: isProduction, // Must be true for SameSite=None
+      sameSite: isProduction ? 'none' : 'lax', // Must be 'none' for cross-site in production
       maxAge: 15 * 60 * 1000, // 15 minutes
+      path: '/',
     });
 
     // Redirect to frontend dashboard (default to localhost:5173 for dev)

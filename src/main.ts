@@ -12,7 +12,9 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
   // Set Global Prefix
-  app.setGlobalPrefix('api');
+  app.setGlobalPrefix('api', {
+    exclude: ['/', 'health', 'healthcheck', 'kaithheathcheck'],
+  });
   
   // Enable CORS
   const allowedOrigins = [
@@ -58,6 +60,6 @@ async function bootstrap() {
 
   app.useGlobalFilters(new AllExceptionsFilter());
 
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(process.env.PORT ?? 3000, '0.0.0.0');
 }
 bootstrap();

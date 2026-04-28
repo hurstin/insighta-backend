@@ -5,8 +5,14 @@ import { AllExceptionsFilter } from './common/filters/all-exceptions.filter';
 import * as morgan from 'morgan';
 import * as cookieParser from 'cookie-parser';
 
+import { ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+  
+  // Set Global Prefix
+  app.setGlobalPrefix('api');
   
   // Enable CORS
   const allowedOrigins = [
@@ -16,7 +22,7 @@ async function bootstrap() {
   ].filter(Boolean) as string[];
 
   app.enableCors({
-    origin: allowedOrigins,
+    origin: true,
     credentials: true,
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     allowedHeaders: 'Content-Type, Accept, Authorization, X-XSRF-TOKEN',

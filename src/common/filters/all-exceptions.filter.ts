@@ -26,7 +26,7 @@ export class AllExceptionsFilter implements ExceptionFilter {
         
         if (msgs.some(m => m.includes('must be a') || m.includes('should not be') || m.includes('is not valid'))) {
            status = HttpStatus.UNPROCESSABLE_ENTITY;
-           message = 'Invalid query parameters';
+           message = 'Invalid parameter type';
         } else if (msgs.some(m => m.includes('empty') || m.includes('missing'))) {
            status = HttpStatus.BAD_REQUEST;
            message = 'Missing or empty parameter';

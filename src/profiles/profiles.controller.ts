@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards, Res } from '@nestjs/common';
+import { Controller, Get, Query, UseGuards, Res, Param } from '@nestjs/common';
 import { Response } from 'express';
 import { ProfilesService } from './profiles.service';
 import { GetProfilesDto } from './dto/get-profiles.dto';
@@ -23,6 +23,12 @@ export class ProfilesController {
   @Roles(Role.ADMIN, Role.ANALYST)
   getProfiles(@Query() query: GetProfilesDto) {
     return this.profilesService.findAll(query);
+  }
+
+  @Get(':id')
+  @Roles(Role.ADMIN, Role.ANALYST)
+  getProfile(@Param('id') id: string) {
+    return this.profilesService.findOne(id);
   }
 
   @Get('export')

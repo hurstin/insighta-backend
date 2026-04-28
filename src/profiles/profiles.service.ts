@@ -49,6 +49,17 @@ export class ProfilesService implements OnModuleInit {
     return this.paginateAndExecute(query, dto.page || 1, dto.limit || 10, dto.sort_by, dto.order);
   }
 
+  async findOne(id: string) {
+    const profile = await this.profileRepository.findOne({ where: { id } });
+    if (!profile) {
+      throw new BadRequestException('Profile not found');
+    }
+    return {
+      status: 'success',
+      data: profile,
+    };
+  }
+
   async search(dto: SearchProfilesDto) {
     // Ensure country map is loaded just in case it wasn't populated on init
     if (Object.keys(this.countryMap).length === 0) {

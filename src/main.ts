@@ -12,9 +12,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   
   // Set Global Prefix
-  app.setGlobalPrefix('api', {
-    exclude: ['auth/(.*)', 'v1/auth/(.*)'],
-  });
+  app.setGlobalPrefix('api');
   
   // Enable CORS
   const allowedOrigins = [

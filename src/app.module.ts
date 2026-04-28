@@ -35,6 +35,9 @@ import { ThrottlerGuard } from '@nestjs/throttler';
         ssl: configService.get<string>('DB_HOST') !== 'localhost' ? {
           rejectUnauthorized: false,
         } : false,
+        extra: {
+          max: 5, // Limit connections per instance
+        }
       }),
       inject: [ConfigService],
     }),

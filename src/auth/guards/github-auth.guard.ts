@@ -34,6 +34,8 @@ export class GithubAuthGuard extends AuthGuard('github') {
         }
       } else if (savedChallenge && !code_verifier) {
         throw new BadRequestException('Missing code_verifier');
+      } else if (!savedChallenge && code_verifier) {
+        throw new BadRequestException('Invalid code_verifier');
       }
     }
     

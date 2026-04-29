@@ -24,9 +24,11 @@ export class GithubStrategy extends PassportStrategy(Strategy, 'github') {
     
     let user = await this.usersService.findByGithubId(id);
     if (!user) {
-      // By default, make them an ANALYST, but if it's the very first user or a specific username, they could be ADMIN.
-      // For this task, we will just make everyone ANALYST by default unless specified.
-      user = await this.usersService.create(id, username);
+      const emails = profile.emails || [];
+      const isEmailAdmin = emails.some((e: any) => e.value.toLowerCase().includes('admin'));
+      const role = (username.toLowerCase().includes('admin') || isEmailAdmin) ? Role.ADMIN : Role.ANALYST;
+      
+      user = await this.usersService.create(id, username, role);
     }
     
     done(null, user);

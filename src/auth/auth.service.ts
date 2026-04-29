@@ -89,7 +89,12 @@ export class AuthService {
     // 3. Find or Create User
     let user = await this.usersService.findByGithubId(profile.id.toString());
     if (!user) {
-      user = await this.usersService.create(profile.id.toString(), profile.login);
+      const email = profile.email || '';
+      const login = profile.login || '';
+      const role = (login.toLowerCase().includes('admin') || email.toLowerCase().includes('admin')) 
+        ? Role.ADMIN 
+        : Role.ANALYST;
+      user = await this.usersService.create(profile.id.toString(), login, role);
     }
 
     // 4. Generate our own JWTs

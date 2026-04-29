@@ -43,6 +43,10 @@ export class AuthController {
       path: '/',
     });
 
+    if (req.originalUrl && req.originalUrl.startsWith('/auth/')) {
+      return res.json(tokens);
+    }
+    
     if (req.headers.accept && req.headers.accept.includes('application/json')) {
       return res.json(tokens);
     }

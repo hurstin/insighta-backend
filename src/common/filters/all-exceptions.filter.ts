@@ -16,9 +16,10 @@ export class AllExceptionsFilter implements ExceptionFilter {
       
       if (status === HttpStatus.BAD_REQUEST) {
         // Validation errors from class-validator typically throw 400
-        const msgs = Array.isArray(exceptionResponse.message)
+        const rawMsgs = Array.isArray(exceptionResponse.message)
           ? exceptionResponse.message
           : [exceptionResponse.message];
+        const msgs = rawMsgs.map((m: any) => String(m).toLowerCase());
         
         // As per requirements: "Invalid queries must return: { status: error, message: Invalid query parameters }"
         // And "400 Bad Request — Missing or empty parameter"

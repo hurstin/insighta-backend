@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Req, Res, UseGuards, Query, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Req, Res, UseGuards, Query, BadRequestException, All, MethodNotAllowedException } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
@@ -25,7 +25,6 @@ export class AuthController {
       return res.redirect(redirectUrl);
     }
 
-    // Default to Web flow
     const isProduction = process.env.NODE_ENV === 'production';
     
     res.cookie('access_token', tokens.access_token, {
@@ -35,15 +34,32 @@ export class AuthController {
       maxAge: 15 * 60 * 1000,
       path: '/',
     });
+    res.cookie('refresh_token', tokens.refresh_token, {
+      httpOnly: true,
+      secure: isProduction,
+      sameSite: isProduction ? 'none' : 'lax',
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+      path: '/',
+    });
+
+    if (req.headers.accept && req.headers.accept.includes('application/json')) {
+      return res.json(tokens);
+    }
 
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
-    return res.redirect(`${frontendUrl}/dashboard`);
+    return res.redirect(`${frontendUrl}/dashboard?access_token=${tokens.access_token}&refresh_token=${tokens.refresh_token}`);
   }
 
   @Post('logout')
+  @UseGuards(JwtAuthGuard)
   async logout(@Res() res: Response) {
     res.clearCookie('access_token');
     return res.status(200).json({ message: 'Logged out' });
+  }
+
+  @All('logout')
+  logoutMethodNotAllowed() {
+    throw new MethodNotAllowedException('Method Not Allowed');
   }
 
   @Post('github/cli-exchange')
@@ -64,5 +80,10 @@ export class AuthController {
       throw new BadRequestException('Refresh token is required');
     }
     return this.authService.refreshTokens(refreshToken);
+  }
+
+  @All('refresh')
+  refreshMethodNotAllowed() {
+    throw new MethodNotAllowedException('Method Not Allowed');
   }
 }

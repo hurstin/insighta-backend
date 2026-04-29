@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Req, Res, UseGuards, Query, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Req, Res, UseGuards, Query, BadRequestException, VERSION_NEUTRAL } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { Response } from 'express';
 import { AuthService } from './auth.service';
 import { GithubAuthGuard } from './guards/github-auth.guard';
 
-@Controller({ path: 'auth', version: '1' })
+@Controller({ path: 'auth', version: ['1', VERSION_NEUTRAL] })
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 

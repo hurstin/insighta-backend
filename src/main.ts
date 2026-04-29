@@ -13,7 +13,7 @@ async function bootstrap() {
   
   // Set Global Prefix
   app.setGlobalPrefix('api', {
-    exclude: ['/', 'health', 'healthcheck', 'kaithheathcheck'],
+    exclude: ['/', 'health', 'healthcheck', 'kaithheathcheck', 'auth', 'auth/(.*)', 'v1/auth', 'v1/auth/(.*)'],
   });
   
   // Enable CORS

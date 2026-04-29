@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Query, UseGuards, Res, Param, VERSION_NEUTRAL } from '@nestjs/common';
+import { Controller, Get, Post, Query, UseGuards, Res, Param } from '@nestjs/common';
 import { Response } from 'express';
 import { ProfilesService } from './profiles.service';
 import { GetProfilesDto } from './dto/get-profiles.dto';
@@ -8,7 +8,7 @@ import { RolesGuard } from '../common/guards/roles.guard';
 import { Roles } from '../common/decorators/roles.decorator';
 import { Role } from '../users/entities/user.entity';
 
-@Controller({ path: 'profiles', version: ['1', VERSION_NEUTRAL] })
+@Controller({ path: 'profiles', version: '1' })
 @UseGuards(JwtAuthGuard, RolesGuard)
 export class ProfilesController {
   constructor(private readonly profilesService: ProfilesService) {}
